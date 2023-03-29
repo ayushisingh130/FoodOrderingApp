@@ -9,6 +9,7 @@ const Cart = (props) => {
   const [isCheckout, setisCheckout] = useState(false);
   const [isSubmitting, setisSubmitting] = useState(false);
   const [didSubmit, setdidSubmit] = useState(false);
+  const [dataIsValid, setdataIsValid] = useState(true);
 
   const cartCtx = useContext(CartContext);
 
@@ -28,6 +29,17 @@ const Cart = (props) => {
   };
 
   const submitOrderHandler = async (userData) => {
+    if (
+      userData.city === "" ||
+      userData.street === "" ||
+      userData.name === "" ||
+      userData.postalCode === ""
+    ) {
+      setdataIsValid(false);
+      return;
+    }
+
+    setdataIsValid(true);
     setisSubmitting(true);
     await fetch(
       "https://food-ordering-app-566f4-default-rtdb.firebaseio.com/orders.json",
@@ -81,7 +93,12 @@ const Cart = (props) => {
         <span> {totalAmount} </span>
       </div>
       {isCheckout && (
-        <Checkout onConfirm={submitOrderHandler} onCancel={props.onHideCart} />
+        <Checkout
+          dataIsValid={dataIsValid}
+          setdataIsValid={setdataIsValid}
+          onConfirm={submitOrderHandler}
+          onCancel={props.onHideCart}
+        />
       )}
       {!isCheckout && modalActions}
     </React.Fragment>
